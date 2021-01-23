@@ -12,7 +12,6 @@ int main(void) {
         strcpy(arg2, p+1);
         n1 = atoi(arg1);
         n2 = atoi(arg2);
-        printf("%d %d", n1, n2);
     }
 
     sprintf(content, "Welcome to add.com: ");
