@@ -40,13 +40,16 @@ int main(int argc, char **argv)
     }
     listenfd = Open_listenfd(argv[1]);
     while (1) { // 무한 서버 루프
+
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA*)&clientaddr, &clientlen); // 반복적으로 연결 요청을 접수
         Getnameinfo((SA*)&clientaddr, clientlen, hostname, MAXLINE,
                     port, MAXLINE, 0);
-        printf("Accepted connection from (%d ,%s, %s)\n",connfd, hostname, port);
+        printf("Accepted connection from (%s, %s)\n", hostname, port);
         doit(connfd); // 트랜잭션 수행   kjkjlkjsdasd
         Close(connfd); // 자신 쪽의 연결 끝을 닫는다.
+        printf("===============================================\n\n");
+
     }
 }
 /**
@@ -71,7 +74,7 @@ void doit(int fd)
     char filename[MAXLINE], cgiargs[MAXLINE];
     rio_t rio;
     /* Read request line and headers */
-    Rio_readinitb(&rio, fd); // rio 구조체 초기화
+    Rio_readinitb(&rio, fd); // &rio 주소를 가지는 버퍼를 만든다.
     Rio_readlineb(&rio, buf, MAXLINE); // 버퍼에서 읽은 것이 담겨있다.
     printf("Request headers:\n");
     printf("%s", buf); // "GET / HTTP/1.1"
@@ -92,7 +95,7 @@ void doit(int fd)
     // 파일이 없는 경우 에러를 띄운다/
     //parse_uri를 들어가기 전에 filename과 cgiargs는 없다.
     is_static = parse_uri(uri, filename, cgiargs);
-    printf(" ========= uri : %s, filename : %s, cgiargs : %s ========= \n", uri, filename, cgiargs);
+    printf("uri : %s, filename : %s, cgiargs : %s \n", uri, filename, cgiargs);
 
     if (stat(filename, &sbuf) < 0) { //stat는 파일 정보를 불러오고 sbuf에 내용을 적어준다. ok 0, errer -1
         clienterror(fd, filename, "404", "Not found",
@@ -238,6 +241,7 @@ void serve_static(int fd, char *filename, int filesize){
     // 파일을 어떤 메모리 공간에 대응시키고 첫주소를 리턴
     srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0); //메모리로 넘기고
     //매핑위치, 매핑시킬 파일의 길이, 메모리 보호정책, 파일공유정책,srcfd ,매핑할때 메모리 오프셋
+//    srcp = malloc(sizeof(srcfd));
 
     Close(srcfd);//닫기
 
@@ -260,7 +264,10 @@ void get_filetype(char *filename, char *filetype){
         strcpy(filename, "image/.png");
     else if (strstr(filename, ".jpg"))
         strcpy(filetype, "image/jpeg");
+    else if (strstr(filename, ".mp4"))
+        strcpy(filetype, "video/mp4");
     else
         strcpy(filetype, "text/plain");
+
 }
 
