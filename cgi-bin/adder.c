@@ -16,13 +16,16 @@ int main(void) {
         strcpy(arg1, buf);
         strcpy(arg2, p+1);
 
-        p = strchr(arg1, '=');
-        *p = '\0';
-        strcpy(arg1, p+1);
+        if (strchr(arg1, '=')) {
+            //html형식에서도 숫자를 받아 처리 할 수 있게끔 변경
+            p = strchr(arg1, '=');
+            *p = '\0';
+            strcpy(arg1, p + 1);
 
-        p = strchr(arg2, '=');
-        *p = '\0';
-        strcpy(arg2, p+1);
+            p = strchr(arg2, '=');
+            *p = '\0';
+            strcpy(arg2, p + 1);
+        }
 
 
         n1 = atoi(arg1);
